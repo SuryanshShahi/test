@@ -1,8 +1,15 @@
+const express = require("express");
 const http = require('http');
 const https = require('https');
 const qs = require('querystring');
-const port = 8080;
+// const port = 8080;
 const checksum_lib = require("./Paytm/checksum/checksum");
+
+const app = express();
+
+app.get("/", (req, res) => {
+    res.sendFile(__dirname + "/index.html");
+  });
 
 var PaytmConfig = {
 	mid: "uDInid37587374103313",
@@ -11,10 +18,23 @@ var PaytmConfig = {
 }
 
 
-http.createServer(function (req, res) {
+// var server = http.createServer((req, res);
+// server.listen(8080);
 
-	switch(req.url){
-		case "/":
+// var server = http.createServer(app);
+
+// app.post("/pay", (req, res) => {
+        // var paymentDetails = {
+        //   amount: req.body.amount,
+        //   customerId: req.body.firstname,
+        //   customerEmail: req.body.email,
+        //   customerPhone: req.body.phone,
+        // };
+	// switch(req.url){
+    // 	case "/pay":
+ 
+
+    app.post("/pay", (req, res) => {
 			var params 						= {};
 			params['MID'] 					= PaytmConfig.mid;
 			params['WEBSITE']				= PaytmConfig.website;
@@ -23,7 +43,7 @@ http.createServer(function (req, res) {
 			params['ORDER_ID']			= 'TEST_'  + new Date().getTime();
 			params['CUST_ID'] 			= 'Customer001';
 			params['TXN_AMOUNT']			= '1.00';
-			params['CALLBACK_URL']		= 'http://localhost:'+port+'/callback';
+			params['CALLBACK_URL']		= 'http://localhost:3003/callback';
 			params['EMAIL']				= 'abc@mailinator.com';
 			params['MOBILE_NO']			= '7777777777';
 
@@ -41,10 +61,12 @@ http.createServer(function (req, res) {
 				res.writeHead(200, {'Content-Type': 'text/html'});
 				res.write('<html><head><title>Merchant Checkout Page</title></head><body><center><h1>Please do not refresh this page...</h1></center><form method="post" action="'+txn_url+'" name="f1">'+form_fields+'</form><script type="text/javascript">document.f1.submit();</script></body></html>');
 				res.end();
-			});
-		break;
+            });
+        });
+		// break;
 	
-		case "/callback":
+        // case "/callback":
+        app.post("/callback", (req, res) => {
 
 			var body = '';
 	        
@@ -99,7 +121,7 @@ http.createServer(function (req, res) {
 
 					// Set up the request
 					var response = "";
-					var post_req = https.request(options, function(post_res) {
+					var post_req = http.createServer(options, function(req, res) {
 						post_res.on('data', function (chunk) {
 							response += chunk;
 						});
@@ -125,8 +147,9 @@ http.createServer(function (req, res) {
 				});
 	        });
 			
-		break;
-	}
-	
-
-}).listen(port);
+		// break;
+	});
+// }
+// });
+// server.listen(8080);
+app.listen(3003, () => console.log("App is running at port 3000..."));
