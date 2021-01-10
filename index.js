@@ -122,11 +122,11 @@ var PaytmConfig = {
 					// Set up the request
 					var response = "";
 					var post_req = http.createServer(options, function(req, res) {
-						post_res.on('data', function (chunk) {
+						post_req.on('data', function (chunk) {
 							response += chunk;
 						});
 
-						post_res.on('end', function(){
+						post_req.on('end', function(){
 							console.log('S2S Response: ', response, "\n");
 
 							var _result = JSON.parse(response);
@@ -142,8 +142,8 @@ var PaytmConfig = {
 					});
 
 					// post the data
-					post_req.write(post_data);
-					post_req.end();
+					res.write(post_data);
+					res.end();
 				});
 	        });
 			
