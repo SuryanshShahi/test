@@ -1,15 +1,8 @@
-const express = require("express");
 const http = require('http');
 const https = require('https');
 const qs = require('querystring');
-// const port = 8080;
+const port = 8080;
 const checksum_lib = require("./Paytm/checksum/checksum");
-
-const app = express();
-
-app.get("/", (req, res) => {
-    res.sendFile(__dirname + "/index.html");
-  });
 
 var PaytmConfig = {
 	mid: "uDInid37587374103313",
@@ -18,23 +11,10 @@ var PaytmConfig = {
 }
 
 
-var httpserver = http.createServer(app);
-httpserver.listen(8080);
-// http.createServer(function (req, res) {
-    // app.post("/pay", (req, res) => {
-        // var paymentDetails = {
-        //   amount: req.body.amount,
-        //   customerId: req.body.firstname,
-        //   customerEmail: req.body.email,
-        //   customerPhone: req.body.phone,
-        // };
-	// switch(req.url){
-    // 	case "/pay":
-    app.get("/", (req, res) => {
-        res.sendFile(__dirname + "/index.html");
-      });
+http.createServer(function (req, res) {
 
-    app.post("/pay", (req, res) => {
+	switch(req.url){
+		case "/":
 			var params 						= {};
 			params['MID'] 					= PaytmConfig.mid;
 			params['WEBSITE']				= PaytmConfig.website;
@@ -43,7 +23,7 @@ httpserver.listen(8080);
 			params['ORDER_ID']			= 'TEST_'  + new Date().getTime();
 			params['CUST_ID'] 			= 'Customer001';
 			params['TXN_AMOUNT']			= '1.00';
-			params['CALLBACK_URL']		= 'http://localhost:3003/callback';
+			params['CALLBACK_URL']		= 'http://localhost:'+port+'/callback';
 			params['EMAIL']				= 'abc@mailinator.com';
 			params['MOBILE_NO']			= '7777777777';
 
@@ -61,12 +41,10 @@ httpserver.listen(8080);
 				res.writeHead(200, {'Content-Type': 'text/html'});
 				res.write('<html><head><title>Merchant Checkout Page</title></head><body><center><h1>Please do not refresh this page...</h1></center><form method="post" action="'+txn_url+'" name="f1">'+form_fields+'</form><script type="text/javascript">document.f1.submit();</script></body></html>');
 				res.end();
-            });
-        });
-		// break;
+			});
+		break;
 	
-        // case "/callback":
-        app.post("/callback", (req, res) => {
+		case "/callback":
 
 			var body = '';
 	        
@@ -147,7 +125,8 @@ httpserver.listen(8080);
 				});
 	        });
 			
-		// break;
-    });
-// });
-app.listen(3003, () => console.log("App is running at port 3000..."));
+		break;
+	}
+	
+
+}).listen(port);
